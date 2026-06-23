@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelas Online Smart WebApp Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#2563eb' }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; }
+        .fade { opacity: 0; transform: translateY(16px); transition: all .7s cubic-bezier(.2,.8,.2,1); }
+        .fade.show { opacity: 1; transform: none; }
+        .glass { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 antialiased">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[90%] max-w-sm"></div>
+
+    <!-- Admin Banner -->
+    <div id="adminBanner" class="hidden sticky top-0 z-40 bg-amber-500 text-white">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2 font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                Mode Admin Aktif
+            </div>
+            <button id="btnLogout" class="px-3 py-1 rounded-lg bg-black/15 hover:bg-black/25 transition">Logout</button>
+        </div>
+    </div>
+
+    <!-- HERO -->
+    <header class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-blue-50 via-[#f0f6ff] to-white"></div>
+        <div class="absolute inset-0 opacity-[0.6]" style="background-image: linear-gradient(to right, rgba(37,99,235,.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(37,99,235,.07) 1px, transparent 1px); background-size: 44px 44px;"></div>
+        <div class="absolute -top-40 -right-40 w-[520px] h-[520px] bg-gradient-to-br from-blue-600/25 to-cyan-400/25 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -left-40 w-[480px] h-[480px] bg-gradient-to-tr from-indigo-500/20 to-blue-600/20 rounded-full blur-3xl"></div>
+        
+        <div class="relative max-w-6xl mx-auto px-4 pt-16 pb-20 md:pt-24 md:pb-28">
+            <div class="flex justify-center mb-6 fade">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white shadow-sm border border-blue-100 text-xs font-medium text-blue-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Kelas Online • Batch 2026
+                </div>
+            </div>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="glass bg-white/60 border border-white/60 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(37,99,235,0.25)] p-8 md:p-12 text-center fade">
+                    <h1 class="text-[32px] leading-tight md:text-5xl md:leading-[1.1] font-extrabold tracking-tight">
+                        <span class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 bg-clip-text text-transparent">Kelas Online</span>
+                        <br class="hidden md:block">
+                        Smart WebApp Builder
+                    </h1>
+                    <p class="mt-4 md:mt-5 text-slate-600 text-base md:text-lg max-w-xl mx-auto">Belajar membuat web app tanpa ribet, cepat, dan profesional. Dari nol sampai deploy.</p>
+                    
+                    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+                        <a id="ctaWA" href="#" target="_blank" class="group relative inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-[#25D366] text-white font-semibold shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/30 hover:-translate-y-0.5 transition-all">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.76.46 3.48 1.34 5L2 22l5.18-1.36a9.89 9.89 0 0 0 4.86 1.24h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2zm5.48 14.12c-.23.65-1.34 1.24-1.85 1.32-.48.08-1.1.11-1.78-.11-.41-.13-.94-.32-1.62-.63-2.85-1.23-4.71-4.1-4.86-4.29-.14-.2-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.26-.29.57-.37.76-.37.19 0 .38 0 .55.01.18.01.42-.07.65.5.24.57.8 1.97.87 2.11.07.14.12.31.02.5-.1.19-.15.3-.3.47-.15.16-.31.36-.45.49-.15.14-.3.3-.13.58.17.29.76 1.25 1.63 2.02.89.79 1.73 1.13 2.03 1.27.24.1.53.08.71-.05.22-.16 1.34-.99 1.69-1.33.07-.07.18-.11.3-.06.34.14 2.13 1 2.5 1.18.36.18.6.27.69.42.09.15.09.86-.14 1.51z"/></svg>
+                            Gabung WA Group
+                        </a>
+                        <a id="ctaApp" href="#" target="_blank" class="group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 hover:-translate-y-0.5 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            Buka Aplikasi
+                        </a>
+                    </div>
+                    <div class="mt-6 flex items-center justify-center gap-4 text-xs text-slate-500">
+                        <div class="flex -space-x-2">
+                            <img class="w-6 h-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/24?1" alt="">
+                            <img class="w-6 h-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/24?2" alt="">
+                            <img class="w-6 h-6 rounded-full ring-2 ring-white" src="https://i.pravatar.cc/24?3" alt="">
+                        </div>
+                        <span>1.200+ member aktif belajar</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- PORTAL -->
+    <main class="max-w-6xl mx-auto px-4 -mt-6 md:-mt-10 pb-20">
+        <section class="fade">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl md:text-[28px] font-bold tracking-tight text-slate-900">Portal Akses Cepat</h2>
+                    <p class="text-slate-500 mt-1 text-sm md:text-[15px]">Semua yang kamu butuhkan dalam satu tempat</p>
+                </div>
+                <button id="btnAdd" class="admin-only hidden items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 shadow-md hover:-translate-y-0.5 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    Tambah Link
+                </button>
+            </div>
+
+            <div id="linkGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5"></div>
+            
+            <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 16.5c-1.5 0-3-1.125-3-3s1.5-3 3-3 3 1.125 3 3-1.5 3-3 3zM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+                </div>
+                <p class="mt-4 font-semibold text-slate-700">Belum ada link</p>
+                <p class="text-sm text-slate-500 mt-1">Masuk mode admin untuk menambah.</p>
+            </div>
+
+            <!-- Quick Settings Admin -->
+            <div id="quickSettings" class="admin-only hidden mt-10">
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 md:p-6">
+                    <h3 class="font-semibold text-slate-900 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 1 0 0 4m0-4a2 2 0 1 1 0 4m-6 8a2 2 0 1 0 0-4m0 4a2 2 0 1 1 0-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 1 0 0-4m0 4a2 2 0 1 1 0-4m0 4v2m0-6V4"/></svg>
+                        Pengaturan Cepat
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="text-xs font-medium text-slate-600">Link WA Group</label>
+                            <input id="qsWa" type="url" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm" placeholder="https://chat.whatsapp.com/...">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-600">Link Aplikasi</label>
+                            <input id="qsApp" type="url" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm" placeholder="https://...">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-600">Judul Video</label>
+                            <input id="qsVideoTitle" type="text" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm" placeholder="Video Tutorial Terbaru">
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-600">URL YouTube / Video</label>
+                            <input id="qsVideoUrl" type="text" class="mt-1 w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm" placeholder="https://youtube.com/watch?v=...">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <button id="btnSaveQuick" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-md shadow-blue-600/20">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIDEO -->
+        <section id="videoSection" class="mt-16 md:mt-24 fade">
+            <div class="max-w-4xl mx-auto">
+                <h2 id="videoTitle" class="text-2xl md:text-[28px] font-bold tracking-tight text-slate-900 text-center">Video Tutorial Terbaru</h2>
+                <p class="text-center text-slate-500 mt-1 text-sm">Pelajari langkah demi langkah membangun web app</p>
+                <div class="mt-6 relative aspect-video bg-black rounded-[1.5rem] overflow-hidden shadow-2xl shadow-slate-900/20 ring-1 ring-slate-900/5">
+                    <div id="videoPlayer" class="w-full h-full"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-200 bg-white/70 backdrop-blur">
+        <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-slate-500">© 2026 Smart WebApp Builder. All rights reserved.</div>
+            <div class="flex items-center gap-5">
+                <a href="#" class="text-slate-400 hover:text-pink-600 transition" aria-label="Instagram">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.9.2 2.4.6.2 1 .5 1.5 1 .4.4.7.9.9 1.5.2.5.3 1.2.4 2.4.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.2 1.9-.4 2.4-.2.6-.5 1-1 1.5-.4.4-.9.7-1.5.9-.5.2-1.2.3-2.4.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.9-.2-2.4-.4a3.8 3.8 0 0 1-1.5-1 3.8 0 0 1-1-1.5c-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.2-1.9.4-2.4.2-.6.5-1 1-1.5.4-.4.9-.7 1.5-.9.5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.4 0-4.6.1-1 .1-1.5.2-1.9.3-.4.2-.7.4-1 .7-.3.3-.5.6-.7 1-.1.4-.2.9-.3 1.9-.1 1.2-.1 1.5-.1 4.6s0 3.4.1 4.6c.1 1 .2 1.5.3 1.9.2.4.4.7.7 1 .3.3.6.5 1 .7.4.1.9.2 1.9.3 1.2.1 1.5.1 4.6.1s3.4 0 4.6-.1c1-.1 1.5-.2 1.9-.3.4-.2.7-.4 1-.7.3-.3.5-.6.7-1 .1-.4.2-.9.3-1.9.1-1.2.1-1.5.1-4.6s0-3.4-.1-4.6c-.1-1-.2-1.5-.3-1.9a2.7 2.7 0 0 0-.7-1 2.7 0 0 0-1-.7c-.4-.1-.9-.2-1.9-.3-1.2-.1-1.5-.1-4.6-.1zm0 3.1a5.1 5.1 0 1 1 0 10.2 5.1 0 0 1 0-10.2zm0 8.4a3.3 3.3 0 1 0 0-6.6 3.3 0 0 0 0 6.6zm5.3-8.7a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>
+                </a>
+                <a href="#" class="text-slate-400 hover:text-red-600 transition" aria-label="YouTube">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.8 15.5v-7l6.2 3.5-6.2 3.5z"/></svg>
+                </a>
+                <a href="#" class="text-slate-400 hover:text-slate-900 transition" aria-label="TikTok">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.7 2v11.5a3.7 3.7 0 1 1-3.7-3.7c.3 0 .7 0 1 .1v2a1.8 1.8 0 1 1.6V2h1.7z"/></svg>
+                </a>
+                <button id="btnAdminFooter" class="ml-2 text-xs text-slate-400 hover:text-slate-700 opacity-60 hover:opacity-100 transition">Admin Login</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL LOGIN -->
+    <div id="modalLogin" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" data-close></div>
+        <div class="relative z-10 w-[92%] max-w-sm mx-auto mt-24 bg-white rounded-2xl shadow-2xl p-6">
+            <h3 class="text-lg font-semibold">Admin Login</h3>
+            <p class="text-sm text-slate-500 mt-1">Masuk untuk mengelola link</p>
+            <form id="formLogin" class="mt-5 space-y-3">
+                <div>
+                    <input id="loginUser" type="text" placeholder="Username" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" required>
+                </div>
+                <div>
+                    <input id="loginPass" type="password" placeholder="Password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" required>
+                </div>
+                <p id="loginError" class="hidden text-xs text-red-600">Username atau password salah</p>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" data-close class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800">Masuk</button>
+                </div>
+                <p class="text-[11px] text-slate-400 text-center pt-1">Default: admin / smart123</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL LINK FORM -->
+    <div id="modalLink" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" data-close></div>
+        <div class="relative z-10 w-[92%] max-w-lg mx-auto mt-10 md:mt-16 bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-auto">
+            <div class="sticky top-0 bg-white px-6 pt-5 pb-3 border-b border-slate-100">
+                <h3 id="modalLinkTitle" class="text-lg font-semibold">Tambah Link</h3>
+            </div>
+            <form id="formLink" class="p-6 space-y-4">
+                <input type="hidden" id="linkId">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <img id="logoPreview" src="" alt="" class="w-14 h-14 rounded-xl bg-slate-100 object-cover border border-slate-200">
+                        <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs font-medium text-slate-600">Logo (max 200KB)</label>
+                        <input id="logoInput" type="file" accept="image/*" class="mt-1 block w-full text-sm file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border-0 file:bg-slate-900 file:text-white hover:file:bg-slate-800 file:cursor-pointer">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Judul</label>
+                    <input id="inpTitle" type="text" required class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" placeholder="WA Group">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Deskripsi</label>
+                    <input id="inpDesc" type="text" required class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" placeholder="Diskusi & update kelas">
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">URL</label>
+                    <input id="inpUrl" type="text" required class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" placeholder="https://... atau #video">
+                    <p id="urlError" class="hidden text-xs text-red-600 mt-1">URL harus dimulai dengan http://, https://, atau #</p>
+                </div>
+                <div>
+                    <label class="text-xs font-medium text-slate-600">Teks Tombol</label>
+                    <input id="inpBtn" type="text" class="mt-1 w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" placeholder="Akses" value="Akses">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" data-close class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50">Batal</button>
+                    <button id="btnSaveLink" type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 inline-flex items-center justify-center gap-2">
+                        <span>Simpan</span>
+                        <svg id="saveSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"></path></svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRM -->
+    <div id="modalConfirm" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" data-close></div>
+        <div class="relative z-10 w-[92%] max-w-sm mx-auto mt-32 bg-white rounded-2xl shadow-2xl p-6 text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-red-100 flex items-center justify-center">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            </div>
+            <h3 class="mt-4 font-semibold text-slate-900">Hapus link ini?</h3>
+            <p class="text-sm text-slate-500 mt-1">Tindakan tidak bisa dibatalkan.</p>
+            <div class="mt-5 flex gap-2">
+                <button data-close class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200">Batal</button>
+                <button id="btnConfirmDelete" class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ================== DATA & STATE ================== */
+const STORAGE_KEY = 'swb_data';
+const ADMIN_KEY = 'swb_admin';
+let isAdmin = false;
+let data = null;
+let deleteId = null;
+let sortable = null;
+
+// Logo default (svg encoded)
+const waLogo = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect rx="12" width="48" height="48" fill="#25D366"/><path fill="white" d="M24 13.5c-5.8 0-10.5 4.7-10.5 10.5 0 1.9.5 3.6 1.4 5.1l-.9 3.3 3.4-.9c1.4.8 3 1.2 4.6 1.2 5.8 0 10.5-4.7 10.5-10.5S29.8 13.5 24 13.5zm5.7 14.9c-.2.6-1.3 1.2-1.8 1.3-.5.1-1.1.1-1.8-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2s-1.1-1.5-1.1-2.9.7-2 1-2.3c.2-.3.5-.4.7-.4h.5c.2 0 .4 0 .6.5.2.5.8 1.9.8 2s0 .3-.1.5l-.3.4c-.1.2-.3.3-.4.5-.1.1-.3.3-.1.6.1.3.7 1.2 1.6 1.9.8.8 1.6 1.1 1.9 1.2.3.1.5.1.7 0 .2-.2 1.3-.9 1.6-1.3.1-.1.2-.1.3 0 .3.1 2 .9 2.3 1.1.4.2.6.3.7.4.1.2.1.8-.2 1.4z"/></svg>`);
+const appLogo = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect rx="12" width="48" height="48" fill="#2563eb"/><g fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><circle cx="24" cy="24" r="9"/><path d="M24 15c3.5 2.5 3.5 15.5 0 18M15 24h18"/></g></svg>`);
+const vidLogo = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect rx="12" width="48" height="48" fill="#ef4444"/><path fill="white" d="M20 18.5v11l9-5.5-9-5.5z"/></svg>`);
+
+const defaultData = {
+    waLink: 'https://chat.whatsapp.com/',
+    appLink: '#',
+    video: { title: 'Video Tutorial Terbaru', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    links: [
+        { id: 1, logo: waLogo, title: 'WA Group', desc: 'Diskusi & update kelas', url: 'https://chat.whatsapp.com/', btn: 'Gabung' },
+        { id: 2, logo: appLogo, title: 'Aplikasi Smart WebApp Builder', desc: 'Buka dashboard builder', url: '#', btn: 'Buka' },
+        { id: 3, logo: vidLogo, title: 'Video Tutorial', desc: 'Tonton panduan lengkap', url: '#video', btn: 'Tonton' },
+    ]
+};
+
+/* ================== UTIL ================== */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function loadData() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+        data = JSON.parse(JSON.stringify(defaultData));
+        saveData();
+    } else {
+        try { data = JSON.parse(raw); } catch { data = JSON.parse(JSON.stringify(defaultData)); }
+    }
+}
+function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+function showToast(msg, type='success') {
+    const wrap = $('#toastContainer');
+    const el = document.createElement('div');
+    el.className = `px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white flex items-center gap-2 transform transition ${type==='success'?'bg-slate-900':'bg-red-600'}`;
+    el.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span>${msg}</span>`;
+    wrap.appendChild(el);
+    setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(10px)'; }, 2700);
+    setTimeout(()=> el.remove(), 3100);
+}
+
+function isValidUrl(u){
+    return /^https?:\/\/.+/i.test(u) || u.startsWith('#');
+}
+
+// resize image ke base64 max ~200KB
+async function fileToBase64(file, max=256) {
+    return new Promise((resolve, reject)=>{
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = e => { img.src = e.target.result; };
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const scale = Math.min(max/img.width, max/img.height, 1);
+            canvas.width = Math.round(img.width*scale);
+            canvas.height = Math.round(img.height*scale);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img,0,0,canvas.width,canvas.height);
+            let quality = 0.85;
+            let out = canvas.toDataURL('image/jpeg', quality);
+            // turunkan quality jika >200KB
+            while (out.length * 0.75 > 200*1024 && quality>0.4) {
+                quality -= 0.1;
+                out = canvas.toDataURL('image/jpeg', quality);
+            }
+            resolve(out);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+/* ================== RENDER ================== */
+function renderAll(){
+    renderLinks();
+    renderVideo();
+    updateCTAs();
+    updateQuickSettings();
+}
+
+function updateCTAs(){
+    $('#ctaWA').href = data.waLink || '#';
+    $('#ctaApp').href = data.appLink || '#';
+}
+
+function renderVideo(){
+    $('#videoTitle').textContent = data.video?.title || 'Video Tutorial Terbaru';
+    const box = $('#videoPlayer');
+    const url = data.video?.url || '';
+    box.innerHTML = '';
+    if (/youtube\.com|youtu\.be/.test(url)) {
+        let embed = url;
+        if (url.includes('watch?v=')) embed = url.replace('watch?v=', 'embed/');
+        if (url.includes('youtu.be/')) embed = url.replace('youtu.be/', 'youtube.com/embed/');
+        if (!embed.includes('embed')) embed = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+        box.innerHTML = `<iframe class="w-full h-full" src="${embed}" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else if (/\.(mp4|webm|ogg)(\?|$)/i.test(url)) {
+        box.innerHTML = `<video class="w-full h-full object-contain bg-black" controls src="${url}"></video>`;
+    } else {
+        box.innerHTML = `<iframe class="w-full h-full" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+    }
+}
+
+function renderLinks(){
+    const grid = $('#linkGrid');
+    grid.innerHTML = '';
+    const links = data.links || [];
+    $('#emptyState').classList.toggle('hidden', links.length>0);
+    
+    links.forEach(link=>{
+        const card = document.createElement('div');
+        card.className = 'group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-5';
+        card.dataset.id = link.id;
+        const isVideoLink = link.url === '#video';
+        const href = isVideoLink ? '#' : link.url;
+        
+        card.innerHTML = `
+            <div class="admin-only hidden absolute top-3 right-3 flex gap-1.5">
+                <button data-edit="${link.id}" class="w-7 h-7 rounded-lg bg-slate-900/90 text-white grid place-items-center hover:bg-slate-900" title="Edit">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button data-del="${link.id}" class="w-7 h-7 rounded-lg bg-red-600 text-white grid place-items-center hover:bg-red-700" title="Hapus">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </div>
+            <div class="flex items-start gap-4">
+                <img src="${link.logo || appLogo}" alt="" class="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100 shrink-0">
+                <div class="min-w-0 flex-1">
+                    <h3 class="font-semibold text-slate-900 leading-snug">${link.title}</h3>
+                    <p class="text-[13px] text-slate-500 mt-1 line-clamp-2">${link.desc || ''}</p>
+                </div>
+            </div>
+            <div class="mt-5 flex items-center justify-between">
+                <div class="admin-only hidden drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 p-1 -ml-1" title="Geser untuk urutkan">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01"/></svg>
+                </div>
+                <a href="${href}" ${isVideoLink?'data-scroll="video"':''} target="${isVideoLink?'_self':'_blank'}" class="ml-auto inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[13px] font-medium shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 transition">
+                    ${link.btn || 'Akses'}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                </a>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    // scroll handler
+    $$('[data-scroll="video"]').forEach(a=>{
+        a.addEventListener('click', e=>{
+            e.preventDefault();
+            document.getElementById('videoSection').scrollIntoView({behavior:'smooth'});
+        });
+    });
+
+    // admin buttons
+    $$('[data-edit]').forEach(b=> b.onclick = ()=> openEdit(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b=> b.onclick = ()=> confirmDelete(parseInt(b.dataset.del)));
+
+    toggleAdminUI();
+    initSortable();
+}
+
+/* ================== ADMIN ================== */
+function checkAdmin(){
+    isAdmin = sessionStorage.getItem(ADMIN_KEY) === '1';
+    $('#adminBanner').classList.toggle('hidden', !isAdmin);
+    toggleAdminUI();
+}
+function toggleAdminUI(){
+    $$('.admin-only').forEach(el=> el.classList.toggle('hidden', !isAdmin));
+    if(isAdmin) $$('.admin-only').forEach(el=> el.classList.remove('hidden'));
+}
+
+function openLogin(){ $('#modalLogin').classList.remove('hidden'); $('#loginUser').focus(); }
+function closeLogin(){ $('#modalLogin').classList.add('hidden'); $('#loginError').classList.add('hidden'); $('#formLogin').reset(); }
+
+$('#btnAdminFooter').onclick = openLogin;
+$('#btnLogout').onclick = ()=>{ sessionStorage.removeItem(ADMIN_KEY); isAdmin=false; checkAdmin(); renderAll(); showToast('Logout berhasil'); };
+
+$('#formLogin').addEventListener('submit', e=>{
+    e.preventDefault();
+    const u = $('#loginUser').value.trim();
+    const p = $('#loginPass').value;
+    if(u==='admin' && p==='smart123'){
+        sessionStorage.setItem(ADMIN_KEY,'1');
+        isAdmin=true; closeLogin(); checkAdmin(); renderAll(); showToast('Mode Admin aktif');
+    } else {
+        $('#loginError').classList.remove('hidden');
+    }
+});
+
+// Modal helpers
+$$('#modalLogin [data-close], #modalLink [data-close], #modalConfirm [data-close]').forEach(b=>{
+    b.addEventListener('click', ()=> b.closest('.fixed').classList.add('hidden'));
+});
+
+/* Link CRUD */
+$('#btnAdd').onclick = ()=> openLinkForm();
+
+function openLinkForm(editData=null){
+    $('#modalLink').classList.remove('hidden');
+    $('#formLink').reset();
+    $('#urlError').classList.add('hidden');
+    $('#logoPreview').src = editData?.logo || appLogo;
+    $('#linkId').value = editData?.id || '';
+    $('#inpTitle').value = editData?.title || '';
+    $('#inpDesc').value = editData?.desc || '';
+    $('#inpUrl').value = editData?.url || '';
+    $('#inpBtn').value = editData?.btn || 'Akses';
+    $('#modalLinkTitle').textContent = editData ? 'Edit Link' : 'Tambah Link';
+}
+
+function openEdit(id){
+    const link = data.links.find(l=>l.id===id);
+    if(link) openLinkForm(link);
+}
+
+function confirmDelete(id){
+    deleteId = id;
+    $('#modalConfirm').classList.remove('hidden');
+}
+$('#btnConfirmDelete').onclick = ()=>{
+    data.links = data.links.filter(l=> l.id !== deleteId);
+    saveData(); renderLinks(); $('#modalConfirm').classList.add('hidden'); showToast('Link dihapus');
+};
+
+$('#logoInput').addEventListener('change', async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 2*1024*1024){ showToast('File terlalu besar', 'error'); return; }
+    const base64 = await fileToBase64(file);
+    $('#logoPreview').src = base64;
+});
+
+$('#formLink').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const url = $('#inpUrl').value.trim();
+    if(!isValidUrl(url)){ $('#urlError').classList.remove('hidden'); return; }
+    $('#urlError').classList.add('hidden');
+    $('#saveSpinner').classList.remove('hidden');
+    
+    await new Promise(r=>setTimeout(r,400)); // simulasi loading
+    
+    const payload = {
+        id: $('#linkId').value ? parseInt($('#linkId').value) : Date.now(),
+        logo: $('#logoPreview').src,
+        title: $('#inpTitle').value.trim(),
+        desc: $('#inpDesc').value.trim(),
+        url, btn: $('#inpBtn').value.trim() || 'Akses'
+    };
+    const idx = data.links.findIndex(l=>l.id===payload.id);
+    if(idx>=0) data.links[idx]=payload; else data.links.push(payload);
+    saveData(); renderLinks();
+    $('#modalLink').classList.add('hidden');
+    $('#saveSpinner').classList.add('hidden');
+    showToast(idx>=0 ? 'Perubahan disimpan' : 'Link berhasil ditambahkan');
+});
+
+/* Sortable */
+function initSortable(){
+    if(!isAdmin) { if(sortable) { sortable.destroy(); sortable=null; } return; }
+    const grid = $('#linkGrid');
+    if(sortable) sortable.destroy();
+    sortable = Sortable.create(grid, {
+        handle: '.drag-handle',
+        animation: 180,
+        ghostClass: 'opacity-50',
+        onEnd: ()=>{
+            const ids = [...grid.children].map(c=> parseInt(c.dataset.id));
+            data.links.sort((a,b)=> ids.indexOf(a.id) - ids.indexOf(b.id));
+            saveData(); showToast('Urutan diperbarui');
+        }
+    });
+}
+
+/* Quick Settings */
+function updateQuickSettings(){
+    if(!isAdmin) return;
+    $('#qsWa').value = data.waLink;
+    $('#qsApp').value = data.appLink;
+    $('#qsVideoTitle').value = data.video.title;
+    $('#qsVideoUrl').value = data.video.url;
+}
+$('#btnSaveQuick').onclick = ()=>{
+    const wa = $('#qsWa').value.trim();
+    const app = $('#qsApp').value.trim();
+    const vt = $('#qsVideoTitle').value.trim();
+    const vu = $('#qsVideoUrl').value.trim();
+    if(wa && !isValidUrl(wa)) return showToast('Link WA tidak valid','error');
+    if(app && !isValidUrl(app) && app!=='#') return showToast('Link Aplikasi tidak valid','error');
+    data.waLink = wa || data.waLink;
+    data.appLink = app || data.appLink;
+    data.video.title = vt || data.video.title;
+    data.video.url = vu || data.video.url;
+    saveData(); renderAll(); showToast('Pengaturan disimpan');
+};
+
+/* ================== INIT & ANIMATIONS ================== */
+function initObserver(){
+    const obs = new IntersectionObserver((entries)=>{
+        entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('show'); obs.unobserve(en.target);} });
+    }, {threshold:0.12});
+    $$('.fade').forEach(el=> obs.observe(el));
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    loadData();
+    checkAdmin();
+    renderAll();
+    initObserver();
+    
+    // Tutup modal klik backdrop
+    $$('.fixed [data-close]').forEach(()=>{}); // already handled
+    document.addEventListener('click', e=>{
+        if(e.target.matches('.fixed .absolute.inset-0')) e.target.parentElement.classList.add('hidden');
+    });
+});
+</script>
+<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+</body>
+</html>
